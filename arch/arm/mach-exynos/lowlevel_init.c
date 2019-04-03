@@ -168,6 +168,24 @@ static void secondary_cores_configure(void)
 extern void relocate_wait_code(void);
 #endif
 
+#ifdef CONFIG_ITOP4412
+void lamp(int count, int time)
+{
+    int i = 0;
+
+	(*(volatile unsigned int *)0x11000064) = 0x02;
+    while(i++ <count)
+    {
+	    (*(volatile unsigned int *)0x11000060) = 0x01<<4;
+        sdelay(time);
+	    (*(volatile unsigned int *)0x11000060) = 0x00<<4;
+        sdelay(time);
+    }
+}
+#else
+void lamp(int count, int time){};
+#endif
+
 int do_lowlevel_init(void)
 {
 	uint32_t reset_status;
@@ -215,6 +233,7 @@ int do_lowlevel_init(void)
 
 	if (actions & DO_CLOCKS) {
 		system_clock_init();
+
 #ifdef CONFIG_DEBUG_UART
 #if (defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_SERIAL_SUPPORT)) || \
     !defined(CONFIG_SPL_BUILD)
@@ -223,8 +242,11 @@ int do_lowlevel_init(void)
 #endif
 #endif
 		mem_ctrl_init(actions & DO_MEM_RESET);
+#ifndef CONFIG_ITOP4412
 		tzpc_init();
+#endif
 	}
 
+    lamp(1, 1000000);
 	return actions & DO_WAKEUP;
 }

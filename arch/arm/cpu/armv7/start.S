@@ -88,7 +88,13 @@ switch_to_hypervisor_ret:
 	bl	cpu_init_crit
 #endif
 #endif
-
+	@light the led 2
+	ldr  r10,=0x11000000+0x0100 @GPL2CON
+	mov  r11,#(0x01<<0)
+	str  r11,[r10]
+	ldr  r10,=0x11000000+0x0104 @GPL2DAT
+	mov  r11,#0x01
+	str  r11,[r10]
 	bl	_main
 
 /*------------------------------------------------------------------------------*/

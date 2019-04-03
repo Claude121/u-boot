@@ -162,6 +162,23 @@ static void exynos5_set_ps_hold_ctrl(void)
 			EXYNOS_PS_HOLD_CONTROL_DATA_HIGH);
 }
 
+static void exynos4_set_ps_hold_ctrl(void)
+{
+	struct exynos4_power *power =
+		(struct exynos4_power *)samsung_get_base_power();
+
+	/* Set PS-Hold high */
+	setbits_le32(&power->ps_hold_control,
+			EXYNOS_PS_HOLD_CONTROL_DATA_HIGH);
+
+	/* GPX0PUD, disable pullup/pulldown */
+    __asm__ __volatile__(
+		"ldr r0,=0x11000000+0x0c08\n"
+		"mov r1,#(0x00<<0)\n"
+		"str r1,[r0]\n"
+		:::"r0","r1");
+}
+
 /*
  * Set ps_hold data driving value high
  * This enables the machine to stay powered on
@@ -172,6 +189,9 @@ void set_ps_hold_ctrl(void)
 {
 	if (cpu_is_exynos5())
 		exynos5_set_ps_hold_ctrl();
+
+	if (cpu_is_exynos4())
+		exynos4_set_ps_hold_ctrl();
 }
 
 

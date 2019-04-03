@@ -28,6 +28,13 @@
 #define DMC_OFFSET	0x10000
 
 /*
+ * To Light the led, for Board Test
+ * @param count : the count to loop
+ *        time  : the time for the led roll
+ */
+void lamp(int count, int time);
+
+/*
  * Memory initialization
  *
  * @param reset     Reset PHY during initialization.
