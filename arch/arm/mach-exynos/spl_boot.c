@@ -253,6 +253,7 @@ void copy_uboot_to_ram(void)
 		break;
 	}
 
+	lamp(1, 50000000);
 	if (copy_bl2)
 		copy_bl2(offset, size, CONFIG_SYS_TEXT_BASE);
 }

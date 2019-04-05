@@ -247,6 +247,6 @@ int do_lowlevel_init(void)
 #endif
 	}
 
-    lamp(1, 1000000);
+	lamp(1, 50000000);
 	return actions & DO_WAKEUP;
 }

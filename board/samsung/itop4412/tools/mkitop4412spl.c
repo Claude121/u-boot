@@ -11,13 +11,12 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define CHECKSUM_OFFSET (14 *1024 -4)
-#define BUFSIZE			(16*1024)
-#define IMG_SIZE		(16*1024)
-#define SPL_HEADER_SIZE		16
+/* header(512) + bl1 + bl2 */
+
+#define CHECKSUM_OFFSET	(14*1024-4)
+#define BUFSIZE	    	(14*1024)
 #define FILE_PERM		(S_IRUSR | S_IWUSR | S_IRGRP \
 				| S_IWGRP | S_IROTH | S_IWOTH)
-#define SPL_HEADER		"EXYNOS4412 HEADER  "
 /*
 * Requirement:
 * IROM code reads first 14K bytes from boot device.
@@ -27,7 +26,7 @@
 * This function takes two filenames:
 * IN  "u-boot-spl.bin" and
 * OUT "$(BOARD)-spl.bin as filenames.
-* It reads the "u-boot-spl.bin" in 16K buffer.
+* It reads the "u-boot-spl.bin" in 14K buffer.
 * It calculates checksum of 14K-4 Bytes and stores at 14K-4 offset in buffer.
 * It writes the buffer to "$(BOARD)-spl.bin" file.
 */
@@ -63,12 +62,10 @@ int main(int argc, char **argv)
 	len = lseek(ifd, 0, SEEK_END);
 	lseek(ifd, 0, SEEK_SET);
 
-	memcpy(&buffer[0], SPL_HEADER, SPL_HEADER_SIZE);
+	count = (len < CHECKSUM_OFFSET)
+		? len : CHECKSUM_OFFSET;
 
-	count = (len < (IMG_SIZE - SPL_HEADER_SIZE))
-		? len : (IMG_SIZE - SPL_HEADER_SIZE);
-
-	if (read(ifd, buffer + SPL_HEADER_SIZE, count) != count) {
+	if (read(ifd, buffer, count) != count) {
 		fprintf(stderr, "%s: Can't read %s: %s\n",
 			argv[0], argv[1], strerror(errno));
 
@@ -80,14 +77,10 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < IMG_SIZE - SPL_HEADER_SIZE; i++)
-		checksum += buffer[i+16];
+	for (i = 0; i < CHECKSUM_OFFSET; i++)
+		checksum += buffer[i];
 
-	*(unsigned long *)buffer ^= 0x1f;
-	*(unsigned long *)(buffer+4) ^= checksum;
-
-	for (i = 1; i < SPL_HEADER_SIZE; i++)
-		buffer[i] ^= buffer[i-1];
+    *(unsigned int*)(buffer + i) = checksum;
 
 	if (write(ofd, buffer, BUFSIZE) != BUFSIZE) {
 		fprintf(stderr, "%s: Can't write %s: %s\n",
