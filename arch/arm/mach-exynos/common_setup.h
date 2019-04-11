@@ -28,11 +28,12 @@
 #define DMC_OFFSET	0x10000
 
 /*
- * To Light the led, for Board Test
- * @param count : the count to loop
- *        time  : the time for the led roll
+ * Debug Function
  */
 void lamp(int count, int time);
+void debug_uart_putc(int ch);
+void debug_uart_prints(char *ch);
+char *itoa (int num, char *str, int radix);
 
 /*
  * Memory initialization

@@ -304,7 +304,9 @@ $(obj)/$(BOARD)-spl.bin: $(obj)/u-boot-spl.bin
 	$(if $(wildcard $(objtree)/spl/board/samsung/$(BOARD)/tools/mk$(BOARD)spl),\
 	$(objtree)/spl/board/samsung/$(BOARD)/tools/mk$(BOARD)spl,\
 	$(objtree)/tools/mkexynosspl) $(VAR_SIZE_PARAM) $< $(objtree)/spl/$(BOARD)-bl2.bin
-	cat $(objtree)/bin/zero.bin $(objtree)/bin/E4412_N.bl1.bin $(objtree)/spl/$(BOARD)-bl2.bin > $@
+	@dd iflag=dsync oflag=dsync if=/dev/zero of=$(objtree)/pad.bin bs=512 count=1 2>/dev/zero
+	@cat $(objtree)/pad.bin $(objtree)/bin/E4412_N.bl1.bin $(objtree)/spl/$(BOARD)-bl2.bin > $@
+	@rm $(objtree)/pad.bin
 endif
 endif
 

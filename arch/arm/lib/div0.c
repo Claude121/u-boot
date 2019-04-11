@@ -5,9 +5,17 @@
  */
 
 /* Replacement (=dummy) for GNU/Linux division-by zero handler */
+#ifdef CONFIG_ITOP4412
 void __div0 (void)
 {
 	extern void hang (void);
 
 	hang();
 }
+#else
+void __div0 (void)
+{
+	for (;;)
+		;
+}
+#endif

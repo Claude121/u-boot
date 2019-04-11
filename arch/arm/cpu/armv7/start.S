@@ -88,16 +88,125 @@ switch_to_hypervisor_ret:
 	bl	cpu_init_crit
 #endif
 #endif
-	@light the led 2
-	ldr  r10,=0x11000000+0x0100 @GPL2CON
-	mov  r11,#(0x01<<0)
-	str  r11,[r10]
-	ldr  r10,=0x11000000+0x0104 @GPL2DAT
-	mov  r11,#0x01
-	str  r11,[r10]
+	bl serail2_init
+	bl light_on_off_the_led_2
 	bl	_main
 
 /*------------------------------------------------------------------------------*/
+ENTRY(light_on_off_the_led_2)
+#define GPL2CON (0x11000000+0x0100)
+#define GPL2DAT (0x11000000+0x0104)
+	ldr  r10,=GPL2CON
+	ldr  r11, [r10]
+	eor  r11, r11, #0x01
+	str  r11, [r10]
+
+	ldr  r10,=GPL2DAT
+	ldr  r11, [r10]
+	eor  r11, r11, #0x01
+	str  r11, [r10]
+
+	bx lr
+ENDPROC(light_on_off_the_led_2)
+
+ENTRY(serail2_init)
+#define GPA1CON     	(0x11400020)
+#define MPLL_CON0    	(0x10040108)
+#define CLK_SRC_DMC  	(0x10040200)
+#define CLK_SRC_TOP1 	(0x1003C214)
+#define CLK_SRC_PERIL0	(0x1003C250)
+#define CLK_DIV_PERIL0	(0x1003C550)
+#define UFCON2      	(0x13820008)
+#define ULCON2      	(0x13820000)
+#define UCON2       	(0x13820004)
+#define UBRDIV2     	(0x13820028)
+#define UFRACVAL2   	(0x1382002c)
+#define UTXH2       	(0x13820020)
+#define URXH2       	(0x13820024)
+#define UTRSTAT2    	(0x13820010)
+
+	ldr r10, =GPA1CON
+	ldr r11, =0x222222
+	str r11, [r10]
+
+	ldr r10, =MPLL_CON0
+	ldr r11, =0x80640300
+	str r11, [r10]
+
+	ldr r10, =CLK_SRC_DMC
+	ldr r11, =0x00011000
+	str r11, [r10]
+
+	ldr r10, =CLK_SRC_TOP1
+	ldr r11, =0x01111000
+	str r11, [r10]
+
+	ldr r10, =CLK_SRC_PERIL0
+	ldr r11, =0x66666
+	str r11, [r10]
+
+	ldr r10, =CLK_DIV_PERIL0
+	ldr r11, =0x777777
+	str r11, [r10]
+
+	ldr r10, =UFCON2
+	ldr r11, =0x111
+	str r11, [r10]
+
+	ldr r10, =ULCON2
+	ldr r11, =0x3
+	str r11, [r10]
+
+	ldr r10, =UCON2
+	ldr r11, =0x3c5
+	str r11, [r10]
+
+	ldr r10, =UBRDIV2
+	ldr r11, =0x35
+	str r11, [r10]
+
+	ldr r10, =UFRACVAL2
+	ldr r11, =0x4
+	str r11, [r10]
+
+	@ print Uart init
+	@ (0x55 0x61 0x72 0x74 0x20 0x49 0x6E 0x69 0x74 0xA 0xD)
+	ldr r10, =UTXH2
+	ldr r11, =0x55
+	str r11, [r10]
+
+	ldr r11, =0x61
+	str r11, [r10]
+
+	ldr r11, =0x72
+	str r11, [r10]
+
+	ldr r11, =0x74
+	str r11, [r10]
+
+	ldr r11, =0x20
+	str r11, [r10]
+
+	ldr r11, =0x49
+	str r11, [r10]
+
+	ldr r11, =0x6E
+	str r11, [r10]
+
+	ldr r11, =0x69
+	str r11, [r10]
+
+	ldr r11, =0x74
+	str r11, [r10]
+
+	ldr r11, =0xA
+	str r11, [r10]
+
+	ldr r11, =0xD
+	str r11, [r10]
+
+	bx lr
+ENDPROC(serail2_init)
 
 ENTRY(c_runtime_cpu_setup)
 /*
@@ -322,7 +431,6 @@ skip_errata_801819:
 	orr	r0, r0, #1 << 12	@ set bit #12
 	mcr	p15, 0, r0, c15, c0, 1	@ write diagnostic register
 #endif
-
 	mov	pc, r5			@ back to my caller
 ENDPROC(cpu_init_cp15)
 

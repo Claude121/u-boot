@@ -253,9 +253,21 @@ void copy_uboot_to_ram(void)
 		break;
 	}
 
-	lamp(1, 50000000);
 	if (copy_bl2)
-		copy_bl2(offset, size, CONFIG_SYS_TEXT_BASE);
+	{
+		if(copy_bl2(offset, size, CONFIG_SYS_TEXT_BASE))
+			debug_uart_prints("COPY BLOCK SUCEESS\n");
+		else
+			debug_uart_prints("COPY BLOCK FAILED\n");
+
+        // dump code from mem, itoa
+		for(unsigned char *src = (unsigned  char *)CONFIG_SYS_TEXT_BASE; src < (unsigned char *)(CONFIG_SYS_TEXT_BASE + size) ; src++)
+        {
+			char string[10];
+            debug_uart_prints(itoa(src[0] & 0xFF, string, 16));
+            debug_uart_prints(" ");
+        }
+	}
 }
 
 void memzero(void *s, size_t n)

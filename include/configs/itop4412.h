@@ -82,10 +82,13 @@
 #define CONFIG_MIU_2BIT_21_7_INTERLEAVED
 
 #define CONFIG_SYS_MMC_ENV_DEV		0
+
+/* | 512B | 8K(bl1) | 14k(bl2/spl) | 16k(ENV) | 512k(u-boot) | */
 #define CONFIG_ENV_SIZE			(16 << 10)	/* 16 KB */
 #define RESERVE_BLOCK_SIZE		(512)
 #define BL1_SIZE			(8 << 10) /*8 K reserved for BL1*/
-#define CONFIG_ENV_OFFSET		(RESERVE_BLOCK_SIZE + BL1_SIZE)
+#define BL2_SIZE			(14 << 10) /*14 K reserved for BL2/SPL */
+#define CONFIG_ENV_OFFSET		(RESERVE_BLOCK_SIZE + BL1_SIZE + BL2_SIZE)
 
 #define CONFIG_SPL_MAX_FOOTPRINT	(14 * 1024)
 

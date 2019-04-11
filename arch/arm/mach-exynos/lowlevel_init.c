@@ -169,22 +169,137 @@ extern void relocate_wait_code(void);
 #endif
 
 #ifdef CONFIG_ITOP4412
+#include <mach/uart.h>
+#define GPL1CON ((volatile unsigned int *)0x11000064)
+#define GPL1DAT ((volatile unsigned int *)0x11000060)
+#define TX_FIFO_FULL		(1 << 24)
+#define UART_BASE			(0x13820000)
+
 void lamp(int count, int time)
 {
-    int i = 0;
+	int i = 0;
 
-	(*(volatile unsigned int *)0x11000064) = 0x02;
-    while(i++ <count)
-    {
-	    (*(volatile unsigned int *)0x11000060) = 0x01<<4;
-        sdelay(time);
-	    (*(volatile unsigned int *)0x11000060) = 0x00<<4;
-        sdelay(time);
-    }
+	*GPL1CON = 0x02;
+	while(i++ <count)
+	{
+		*GPL1DAT = 0x01<<4;
+		sdelay(time);
+		*GPL1DAT = 0x00<<4;
+		sdelay(time);
+	}
+}
+
+void debug_uart_putc(int ch)
+{
+	struct s5p_uart *uart = (struct s5p_uart *)UART_BASE;
+
+	while (readl(&uart->ufstat) & TX_FIFO_FULL);
+
+	writeb(ch, &uart->utxh);
+}
+
+/*
+ *	@param
+ *	  num: input integer, str: Buf to contain string
+ *
+ */
+char *itoa (int num, char *str, int radix)
+{
+	const char table[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	char *ptr = str;
+	bool negative = false;
+	unsigned int nc = 0, cn = 0;
+
+	if (num == 0)
+	{
+		ptr[nc++] = '0';
+		ptr[nc++] = '\0';
+		return str;
+	}
+
+	if (num < 0)
+	{
+		ptr[nc++] = '-';
+		num *= -1;
+		negative = true;
+	}
+
+	while (num)
+	{
+		ptr[nc++] = table[num%radix];
+		num /= radix;
+	}
+	ptr[nc] = '\0';
+
+	nc--;
+	if (negative)
+		cn++;
+
+	while (nc > cn)
+	{
+		char temp = ptr[nc];
+		ptr[nc--] = ptr[cn];
+		ptr[cn++] = temp;
+	}
+	return str;
+}
+
+void debug_uart_prints(char *ch)
+{
+	char *s = ch;
+	for(;;s++)
+	{
+		debug_uart_putc(*s);
+
+		if (*s == '\n')
+		{
+			debug_uart_putc('\r');
+			break;
+		} else if(*s == '\0')
+		{
+			break;
+		}
+	}
 }
 #else
 void lamp(int count, int time){};
+void debug_uart_putc(int ch){};
+void debug_uart_prints(char *ch){};
+char *itoa (int num, char *str, int radix){return NULL;};
 #endif
+
+static inline void test_mem_init(void)
+{
+#define MEM_SIZE 0x40000000
+#define MEM_BASE_ADDR ((unsigned char*)0x40000000)
+#define MEM_BASE_ENDA ((unsigned char*)0x80000000)
+	char write[10] = "T", read[10] = "\0";
+	unsigned char *dest = MEM_BASE_ADDR;
+
+	debug_uart_prints("Start mem test\n");
+	while(1) {
+		for (unsigned long count = 0; count < MEM_SIZE; count += 1)
+		{
+			read[0] = '\0';
+			dest[count] = write[0];
+			read[0] = dest[count];
+
+			if (read[0]!=write[0])
+			{
+				debug_uart_prints("Copy Failed >>>");
+				debug_uart_prints("Write:");
+				debug_uart_putc(write[0]);
+				debug_uart_prints("		");
+				debug_uart_prints("Read:");
+				debug_uart_putc(read[0]);
+				debug_uart_prints("\n");
+			}
+
+			if (!(count % (1024 * 1024 * 128)))
+				debug_uart_prints("================ Pass 128 M\n");
+		}
+	}
+}
 
 int do_lowlevel_init(void)
 {
@@ -236,7 +351,7 @@ int do_lowlevel_init(void)
 
 #ifdef CONFIG_DEBUG_UART
 #if (defined(CONFIG_SPL_BUILD) && defined(CONFIG_SPL_SERIAL_SUPPORT)) || \
-    !defined(CONFIG_SPL_BUILD)
+	!defined(CONFIG_SPL_BUILD)
 		exynos_pinmux_config(PERIPH_ID_UART3, PINMUX_FLAG_NONE);
 		debug_uart_init();
 #endif
@@ -246,7 +361,5 @@ int do_lowlevel_init(void)
 		tzpc_init();
 #endif
 	}
-
-	lamp(1, 50000000);
 	return actions & DO_WAKEUP;
 }
