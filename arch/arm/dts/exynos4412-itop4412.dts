@@ -10,7 +10,7 @@
 #include "exynos4412.dtsi"
 
 / {
-	model = "Odroid based on Exynos4412";
+	model = "Itop4412 based on Exynos4412";
 	compatible = "samsung,odroid", "samsung,exynos4412";
 
 	aliases {

@@ -88,7 +88,6 @@ switch_to_hypervisor_ret:
 	bl	cpu_init_crit
 #endif
 #endif
-	bl serail2_init
 	bl light_on_off_the_led_2
 	bl	_main
 

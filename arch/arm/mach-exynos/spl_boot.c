@@ -255,11 +255,8 @@ void copy_uboot_to_ram(void)
 
 	if (copy_bl2)
 	{
-		if(copy_bl2(offset, size, CONFIG_SYS_TEXT_BASE))
-			debug_uart_prints("COPY BLOCK SUCEESS\n");
-		else
-			debug_uart_prints("COPY BLOCK FAILED\n");
-
+		copy_bl2(offset, size, CONFIG_SYS_TEXT_BASE);
+#if 0
         // dump code from mem, itoa
 		for(unsigned char *src = (unsigned  char *)CONFIG_SYS_TEXT_BASE; src < (unsigned char *)(CONFIG_SYS_TEXT_BASE + size) ; src++)
         {
@@ -267,6 +264,7 @@ void copy_uboot_to_ram(void)
             debug_uart_prints(itoa(src[0] & 0xFF, string, 16));
             debug_uart_prints(" ");
         }
+#endif
 	}
 }
 
