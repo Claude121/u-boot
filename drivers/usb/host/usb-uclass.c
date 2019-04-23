@@ -246,7 +246,9 @@ int usb_init(void)
 	int ret;
 
 	asynch_allowed = 1;
-
+#ifdef CONFIG_ITOP4412
+	board_usb_init(0, USB_INIT_HOST);
+#endif
 	ret = uclass_get(UCLASS_USB, &uc);
 	if (ret)
 		return ret;
