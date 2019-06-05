@@ -60,8 +60,8 @@
 		regulators {
 			ldo1_reg: LDO1 {
 				regulator-name = "VDD_ALIVE";
-				regulator-min-microvolt = <1100000>;
-				regulator-max-microvolt = <1100000>;
+				regulator-min-microvolt = <1000000>;
+				regulator-max-microvolt = <1000000>;
 				regulator-always-on;
 				regulator-boot-on;
 			};
@@ -69,8 +69,8 @@
 			/* SCP uses 1.5v, POP uses 1.2v */
 			ldo2_reg: LDO2 {
 				regulator-name = "VDDQ_M12";
-				regulator-min-microvolt = <1500000>;
-				regulator-max-microvolt = <1500000>;
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <1200000>;
 				regulator-always-on;
 				regulator-boot-on;
 			};
@@ -115,8 +115,8 @@
 
 			ldo9_reg: LDO9 {
 				regulator-name = "VDD33_LCD";
-				regulator-min-microvolt = <3300000>;
-				regulator-max-microvolt = <3300000>;
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3000000>;
 			};
 
 			ldo10_reg: LDO10 {
@@ -134,8 +134,8 @@
 
 			ldo12_reg: LDO12 {
 				regulator-name = "VDD33_UOTG";
-				regulator-min-microvolt = <3300000>;
-				regulator-max-microvolt = <3300000>;
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3000000>;
 				regulator-always-on;
 			};
 
@@ -176,8 +176,8 @@
 			/* Used by HSIC */
 			ldo18_reg: LDO18 {
 				regulator-name = "VDDIOPERI_28";
-				regulator-min-microvolt = <3300000>;
-				regulator-max-microvolt = <3300000>;
+				regulator-min-microvolt = <2800000>;
+				regulator-max-microvolt = <2800000>;
 				regulator-always-on;
 			};
 
@@ -187,32 +187,30 @@
 
 			ldo20_reg: LDO20 {
 				regulator-name = "VDD28_CAM";
-				regulator-min-microvolt = <1800000>;
-				regulator-max-microvolt = <2800000>;
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3000000>;
 			};
 
 			ldo21_reg: LDO21 {
 				regulator-name = "VDD28_AF";
-				regulator-min-microvolt = <1800000>;
-				regulator-max-microvolt = <2800000>;
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3000000>;
 			};
 
 			ldo22_reg: LDO22 {
 				regulator-name = "VDDA28_2M";
-				regulator-min-microvolt = <2800000>;
-				regulator-max-microvolt = <2800000>;
 			};
 
 			ldo23_reg: LDO23 {
-				regulator-name = "VDD28_TF";
+				regulator-name = "VDD_TF";
 				regulator-min-microvolt = <2800000>;
 				regulator-max-microvolt = <2800000>;
 			};
 
 			ldo24_reg: LDO24 {
 				regulator-name = "VDD33_A31";
-				regulator-min-microvolt = <3300000>;
-				regulator-max-microvolt = <3300000>;
+				regulator-min-microvolt = <3000000>;
+				regulator-max-microvolt = <3000000>;
 			};
 
 			ldo25_reg: LDO25 {
@@ -229,14 +227,10 @@
 
 			ldo27_reg: LDO27 {
 				regulator-name = "GPS_1V8";
-				regulator-min-microvolt = <1800000>;
-				regulator-max-microvolt = <1800000>;
 			};
 
 			ldo28_reg: LDO28 {
 				regulator-name = "DVDD12";
-				regulator-min-microvolt = <1200000>;
-				regulator-max-microvolt = <1200000>;
 			};
 
 			buck1_reg: BUCK1 {

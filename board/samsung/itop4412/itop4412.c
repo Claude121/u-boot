@@ -61,29 +61,61 @@ int exynos_init(void)
 	return 0;
 }
 
+static int exynos_set_regulator(const char *name, uint uv)
+{
+	struct udevice *dev;
+	int ret;
+
+	ret = regulator_get_by_platname(name, &dev);
+	if (ret) {
+		debug("%s: Cannot find regulator %s\n", __func__, name);
+		return ret;
+	}
+	ret = regulator_set_value(dev, uv);
+	if (ret) {
+		debug("%s: Cannot set regulator %s\n", __func__, name);
+		return ret;
+	}
+
+	return 0;
+}
+
 int exynos_power_init(void)
 {
+	struct udevice *dev;
+	int ret;
+
+	ret = pmic_get("s5m8767-pmic", &dev);
+	if (!ret)
+		s5m8767_enable_32khz_cp(dev);
+
+	if (ret == -ENODEV)
+		return 0;
+
+	ret = regulators_enable_boot_on(false);
+	if (ret)
+		return ret;
+
+	ret = exynos_set_regulator("vdd_mif", 1100000);
+	if (ret)
+		return ret;
+
+	ret = exynos_set_regulator("vdd_arm", 1300000);
+	if (ret)
+		return ret;
+	ret = exynos_set_regulator("vdd_int", 1012500);
+	if (ret)
+		return ret;
+	ret = exynos_set_regulator("vdd_g3d", 1200000);
+	if (ret)
+		return ret;
+
 	return 0;
 }
 
 #ifdef CONFIG_USB_GADGET
 static int s5pc210_phy_control(int on)
 {
-/*
-	struct udevice *dev;
-	int ret;
-
-	ret = regulator_get_by_platname("VDD_UOTG_3.0V", &dev);
-	if (ret) {
-		pr_err("Regulator get error: %d\n", ret);
-		return ret;
-	}
-
-	if (on)
-		return regulator_set_mode(dev, OPMODE_ON);
-	else
-		return regulator_set_mode(dev, OPMODE_LPM);
-*/
 	return 0;
 }
 
@@ -100,23 +132,25 @@ struct dwc2_plat_otg_data s5pc210_otg_data = {
 
 int board_usb_init(int index, enum usb_init_type init)
 {
-#ifdef CONFIG_CMD_USB
-	struct udevice *dev;
-	int ret;
+	if(init == USB_INIT_HOST)
+	{
+		/* Itop4412 Us have it at 12MHz */
+		printf("setting gpio\n");
+		/* Disconnect, Reset, Connect */
+		gpio_direction_output(EXYNOS4X12_GPIO_M33, 0);
+		gpio_direction_output(EXYNOS4X12_GPIO_M24, 0);
+		gpio_direction_output(EXYNOS4X12_GPIO_M24, 1);
+		gpio_direction_output(EXYNOS4X12_GPIO_M33, 1);
 
-	/* Itop4412 Us have it at 12MHz */
-printf("setting gpio\n");
-	/* Disconnect, Reset, Connect */
-	gpio_direction_output(EXYNOS4X12_GPIO_M33, 0);
-	gpio_direction_output(EXYNOS4X12_GPIO_M24, 0);
-	gpio_direction_output(EXYNOS4X12_GPIO_M24, 1);
-	gpio_direction_output(EXYNOS4X12_GPIO_M33, 1);
-
-    gpio_direction_output(EXYNOS4X12_GPIO_C01, 0);
-    udelay(7000);
-    gpio_direction_output(EXYNOS4X12_GPIO_C01, 1);
-#endif
-	debug("USB_udc_probe\n");
-	return dwc2_udc_probe(&s5pc210_otg_data);
+		gpio_direction_output(EXYNOS4X12_GPIO_C01, 0);
+		udelay(7000);
+		gpio_direction_output(EXYNOS4X12_GPIO_C01, 1);
+		return 0;
+	} else if(init == USB_INIT_DEVICE)
+	{
+		debug("USB_udc_probe\n");
+		return dwc2_udc_probe(&s5pc210_otg_data);
+	} else
+		return -EINVAL;
 }
 #endif

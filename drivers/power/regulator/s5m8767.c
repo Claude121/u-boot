@@ -143,14 +143,14 @@ static int ldo_get_value(struct udevice *dev)
 {
 	int ldo = dev->driver_data;
 
-	return reg_get_value(dev, &ldo_param[ldo]);
+	return reg_get_value(dev, &ldo_param[ldo - 1]);
 }
 
 static int ldo_set_value(struct udevice *dev, int uv)
 {
 	int ldo = dev->driver_data;
 
-	return reg_set_value(dev, &ldo_param[ldo], uv);
+	return reg_set_value(dev, &ldo_param[ldo - 1], uv);
 }
 
 static int reg_get_enable(struct udevice *dev, const struct s5m8767_para *param)
@@ -187,14 +187,14 @@ static int ldo_get_enable(struct udevice *dev)
 {
 	int ldo = dev->driver_data;
 
-	return reg_get_enable(dev, &ldo_param[ldo]);
+	return reg_get_enable(dev, &ldo_param[ldo - 1]);
 }
 
 static int ldo_set_enable(struct udevice *dev, bool enable)
 {
 	int ldo = dev->driver_data;
 
-	return reg_set_enable(dev, &ldo_param[ldo], enable);
+	return reg_set_enable(dev, &ldo_param[ldo - 1], enable);
 }
 
 static int s5m8767_buck_probe(struct udevice *dev)
@@ -213,28 +213,28 @@ static int buck_get_value(struct udevice *dev)
 {
 	int buck = dev->driver_data;
 
-	return reg_get_value(dev, &buck_param[buck]);
+	return reg_get_value(dev, &buck_param[buck - 1]);
 }
 
 static int buck_set_value(struct udevice *dev, int uv)
 {
 	int buck = dev->driver_data;
 
-	return reg_set_value(dev, &buck_param[buck], uv);
+	return reg_set_value(dev, &buck_param[buck - 1], uv);
 }
 
 static int buck_get_enable(struct udevice *dev)
 {
 	int buck = dev->driver_data;
 
-	return reg_get_enable(dev, &buck_param[buck]);
+	return reg_get_enable(dev, &buck_param[buck - 1]);
 }
 
 static int buck_set_enable(struct udevice *dev, bool enable)
 {
 	int buck = dev->driver_data;
 
-	return reg_set_enable(dev, &buck_param[buck], enable);
+	return reg_set_enable(dev, &buck_param[buck - 1], enable);
 }
 
 static const struct dm_regulator_ops s5m8767_ldo_ops = {

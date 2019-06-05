@@ -1037,7 +1037,7 @@ u-boot.bin: u-boot-nodtb.bin FORCE
 endif
 ifeq ($(CONFIG_ITOP4412),y)
 	@dd iflag=dsync oflag=dsync if=/dev/zero of=allpadzero.bin bs=512 count=32 2>/dev/zero
-	@cat spl/itop4412-spl.bin allpadzero.bin u-boot.bin > itop4412_uboot.bin
+	@cat spl/itop4412-spl.bin allpadzero.bin u-boot.bin > itop4412_uboot.img
 	@rm allpadzero.bin
 endif
 

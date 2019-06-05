@@ -45,7 +45,7 @@ void otg_phy_init(struct dwc2_udc *dev)
 	dev->pdata->phy_control(1);
 
 	/* USB PHY0 Enable */
-	printf("USB PHY0 Enable\n");
+	debug("USB PHY0 Enable\n");
 
 	/* Enable PHY */
 	writel(readl(usb_phy_ctrl) | USB_PHY_CTRL_EN0, usb_phy_ctrl);

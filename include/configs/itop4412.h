@@ -47,6 +47,7 @@
 #define CONFIG_SPL_TEXT_BASE	0x02023400
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"serial#=ITOP4412-01" \
 	"loadaddr=0x40007000\0" \
 	"rdaddr=0x48000000\0" \
 	"kerneladdr=0x40007000\0" \
