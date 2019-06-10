@@ -1,0 +1,6 @@
+GEC210 BOARD
+M:	Robert Baldyga <r.baldyga@samsung.com>
+S:	Maintained
+F:	board/samsung/gec210/
+F:	include/configs/s5p_gec210.h
+F:	configs/s5p_gec210_defconfig
